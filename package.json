@@ -20,8 +20,6 @@
   },
   "homepage": "https://github.com/DestaHutamaP/Sistem-Manajemen-Tugas-Kuliah#readme",
   "dependencies": {
-    "bluebird": "^3.7.2",
-    "sqlite": "^5.1.1",
     "sqlite3": "^5.1.6"
   }
 }
