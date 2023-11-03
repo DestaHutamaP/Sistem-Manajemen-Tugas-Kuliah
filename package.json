@@ -1,0 +1,22 @@
+{
+  "name": "sistem-manajemen-tugas-kuliah",
+  "version": "1.0.0",
+  "description": "Proyek akhir Scripting Language Sistem Manajemen Tugas Kuliah",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DestaHutamaP/Sistem-Manajemen-Tugas-Kuliah.git"
+  },
+  "keywords": [
+    "tugaskuliah"
+  ],
+  "author": "Kelompok 1",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DestaHutamaP/Sistem-Manajemen-Tugas-Kuliah/issues"
+  },
+  "homepage": "https://github.com/DestaHutamaP/Sistem-Manajemen-Tugas-Kuliah#readme"
+}
