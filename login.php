@@ -1,4 +1,27 @@
 <?php 
+
+$database = new SQLite3("./js/db/manajemen_tugas_kuliah.db");
+
+if($_SERVER['REQUEST_METHOD']=="POST"){
+  $NIM = $_POST['NIM'];
+  $password = $_POST['password'];
+  
+  $username = SQLite3::escapeString($NIM);
+  $password = SQLITE3::escapeString($password);
+  
+  $query="SELECT * FROM user WHERE NIM = '$NIM' AND password = '$password'";
+  $result = $database->query($query);
+  
+  if( $result->fetchArray(SQLITE3_ASSOC) == null ) {
+    echo "hehe";
+  }
+  else {echo "XD";
+  
+  }
+}
+
+
+$database->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,7 +47,7 @@
                           <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Log in</h3>
               
                           <div class="form-outline mb-4">
-                            <input type="username" id="username" class="form-control form-control-lg" name="username" />
+                            <input type="username" id="NIM" class="form-control form-control-lg" name="NIM" />
                             <label class="form-label" for="username">Username</label>
                           </div>
               
