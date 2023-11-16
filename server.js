@@ -53,8 +53,66 @@ app.post('/task', (req, res) => {
 
 app.get('/task/:id', (req, res) => {
   const userId = req.params.id;
-
+ var lateTableRows =''
+ var lateData=null;
   if (userId) {
+
+    db.get('SELECT * FROM users WHERE id=?',userId,(err,row)=>{
+      if(err){
+        console.error(err.message);
+        res.status(500).send('Terjadi kesalahan dalam mengambil data pengguna, ');
+      }else{
+        db.serialize(()=>{
+          db.run(`CREATE TABLE IF NOT EXISTS user${row.id} (id INTEGER PRIMARY KEY AUTOINCREMENT, nama TEXT, deadline DATE)`);
+
+          db.all(`SELECT * FROM user${row.id} WHERE deadline < DATE('now') ORDER BY deadline ASC, id ASC`, (err,rows)=>{
+            if(err){
+              console.error(err.message);
+              res.status(500).send('Terjadi kesalahan dalam mengambil data Task !, ');
+
+            }else{
+              console.log('querry called 2')
+               lateTableRows = rows.map(task=>`
+              <tr>
+                    <td>${task.id}</td>
+                    <td>${task.nama}</td>
+                    <td>${task.deadline}</td>
+                    <td>
+                      <form method="POST" action="/task/edit">
+                        <input type="hidden" name="id" value="${task.id}">
+                        <input type="hidden" name="user_id" value="${userId}">
+                        <button class="btn btn-info btn-lg btn-block" type="submit">Edit</button>
+                      </form>
+                    </td>
+                    <td>
+                      <form method="POST" action="/task/hapus" onSubmit="return konfirmasiHapus()">
+                        <input type="hidden" name="id" value="${task.id}">
+                        <input type="hidden" name="user_id" value="${userId}">
+                        <button class="btn btn-danger btn-lg btn-block" type="submit">Hapus</button>
+                      </form>
+                    </td>
+                  </tr>
+              `).join( ' ' );
+
+              lateData = ` <h1>Task Terlambat</h1>
+              <table>
+                <tr>
+                  <th>ID</th>
+                  <th>Nama Tugas</th>
+                  <th>Deadline</th>
+                  <th>Edit</th>
+                  <th>Hapus</th>
+                </tr> 
+                ${lateTableRows} 
+                `
+
+              
+            }
+          });
+        });
+      }
+    });
+
     db.get('SELECT * FROM users WHERE id = ?', userId, (err, row) => {
       if (err) {
         console.error(err.message);
@@ -63,11 +121,12 @@ app.get('/task/:id', (req, res) => {
           db.serialize(() => {
             db.run(`CREATE TABLE IF NOT EXISTS user${row.id} (id INTEGER PRIMARY KEY AUTOINCREMENT, nama TEXT, deadline DATE)`);
 
-            db.all(`SELECT * FROM user${row.id} ORDER BY deadline ASC, id ASC`, (err, rows) => {
+            db.all(`SELECT * FROM user${row.id} WHERE deadline > Date('now') ORDER BY deadline ASC, id ASC`, (err, rows) => {
               if (err) {
                 console.error(err.message);
                 res.status(500).send('Terjadi kesalahan dalam mengambil data task!');
               } else {
+                console.log('query called')
                 const tableRows = rows.map(task => `
                   <tr>
                     <td>${task.id}</td>
@@ -90,7 +149,7 @@ app.get('/task/:id', (req, res) => {
                   </tr>
                 `).join('');
           
-                const html = `
+                let html = `
                   <html>
                     <head>
                       <title>Task</title>
@@ -143,7 +202,8 @@ app.get('/task/:id', (req, res) => {
   
                       <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Hai, ${row.username}</h3>
   
-                      <h1>Task</h1>
+                      <h1>Task </h1>
+                      
                       <table>
                         <tr>
                           <th>ID</th>
@@ -152,8 +212,22 @@ app.get('/task/:id', (req, res) => {
                           <th>Edit</th>
                           <th>Hapus</th>
                         </tr>
-                        ${tableRows}                          
+                        ${tableRows}  
+                        </table>
+
+                        
+                        
+                      
+                        
+                      
+                      
                 `;
+
+                if(lateData !=null){
+                 html=html + lateData 
+                }else{
+                  
+                }
           
                 res.send(html);
               }
